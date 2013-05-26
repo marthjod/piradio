@@ -113,3 +113,22 @@ Prepare _piradio_
 * Install package _JsonConfigReader_ from [DisposaBoy](https://github.com/DisposaBoy/JsonConfigReader): `go get github.com/DisposaBoy/JsonConfigReader`
 * In your _$GOPATH_, make subdirectories _player/_, _sayer/_, _alarm/_ 
 * Copy _player.go_, _sayer.go_ and _alarm.go_ to their _$GOPATH_ directories
+* Install packages:
+
+```bash
+go install player
+go install sayer
+go install alarm
+```
+
+* Populate your _streams.list_
+* Acquire some sounds for alarm ticks with, e.g.,
+
+```bash
+mplayer -really-quiet -noconsolecontrols \
+  -dumpaudio -dumpfile 1m30s.mp3 \
+  "http://translate.google.com/translate_tts?tl=en&q=one+minute+thirty+seconds+left"
+```
+
+* Add sound file names and paths to your _sounds.json_, accordingly
+* Run _main.go_: `go run main.go`
