@@ -12,6 +12,8 @@ Description
 via [VLC media player](http://www.videolan.org/vlc/). Ideally, it should become usable
 with acoustic feedback only and controllable via remote control vel sim.
 
+Usage 
+=====
 
 As of now, _main.go_ recognizes the following commands from keyboard input:
 
