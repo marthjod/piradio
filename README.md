@@ -9,7 +9,9 @@ Description
 ===========
 
 **piradio** provides convenience wrapper functions for playing and controlling network streams 
-via [VLC media player](http://www.videolan.org/vlc/).
+via [VLC media player](http://www.videolan.org/vlc/). Ideally, it should become usable
+with acoustic feedback only.
+
 
 As of now, it recognizes the following commands from keyboard input:
 
@@ -19,7 +21,7 @@ As of now, it recognizes the following commands from keyboard input:
 | `quit`    | Quit main executable |
 | `volup`   | Increase volume by 100 |
 | `voldown` | Decrease volume by 100 |
-| `alarm`   | Set up alarm |
+| `alarm`   | Set up alarm (details see below) |
 
 
 Setting up an alarm (user input marked with `#`) and alarm output:
@@ -51,7 +53,7 @@ What's missing
 
 In the future, it should be possible to acquire input by more comfortable means than typing commands on  
 a keyboard; for example, via remote control. 
-
+Also, feedback to the user should only be acoustic (controlling _piradio_ without having to look at it).
 
 Internals
 =========
@@ -66,6 +68,18 @@ Streams
 Streams are read from _streams.list_ (containing one network stream URL per line) 
 and played in the file's order. If the last stream is reached, the next stream
 will be the first one in the list again.
+
+_Player_ objects must be initialized with a valid path to a _streams.list_.
+
+Sounds
+------
+
+Sound files are needed for acoustic feedback (alarm ringing, alarm tick messages, error messages).
+They are best placed in a _sounds/_ subdirectory with corresponding mappings in _sounds.json_.
+
+_Sayer_ objects must be initialized with a valid path to a _sounds.json_.
+
+
 
 
 Alarms
