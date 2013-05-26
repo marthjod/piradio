@@ -35,8 +35,8 @@ Set up alarm (timer)
 
 Setting up an alarm (user input marked with `#`) and example alarm output:
 
-```bash
-alarm #
+```
+<strong>alarm</strong> #
 Total: 2m30s #
 Start ticking at ... left: 1m #
 Tick every ...: 10s #
