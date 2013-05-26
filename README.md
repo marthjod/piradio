@@ -1,7 +1,7 @@
 piradio
 =======
 
-Go wrappings for network stream playing (think Internet radio) plus 
+[Go](http://golang.org) wrappings for network stream playing (think Internet radio) plus 
 timer functions targeted at running on a [Raspberry Pi](http://www.raspberrypi.org/)
 
 
