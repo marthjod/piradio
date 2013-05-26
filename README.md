@@ -11,6 +11,14 @@ Description
 **piradio** provides convenience wrapper functions for playing and controlling network streams 
 via [VLC media player](http://www.videolan.org/vlc/).
 
+Right now, it recognizes the following commands from keyboard input:
+
+| Command | Function |
+|:--------|:---------|
+| next    |          |
+
+In the future, user input should be acquired by, for example, remote controls. 
+
 
 Internals
 =========
