@@ -1,7 +1,7 @@
 piradio
 =======
 
-[Go](http://golang.org) wrappings for network stream playing (think Internet radio) plus 
+[Go](http://golang.org) wrapping for network stream playing (think Internet radio) plus 
 timer functions targeted at running on a [Raspberry Pi](http://www.raspberrypi.org/)
 
 
@@ -110,4 +110,6 @@ and [here](http://elinux.org/RPi_Easy_SD_Card_Setup#SD_card_setup) and by runnin
 
 Prepare _piradio_
 -----------------
-
+* Install package _JsonConfigReader_ from [DisposaBoy](https://github.com/DisposaBoy/JsonConfigReader): `go get github.com/DisposaBoy/JsonConfigReader`
+* In your _$GOPATH_, make subdirectories _player/_, _sayer/_, _alarm/_ 
+* Copy _player.go_, _sayer.go_ and _alarm.go_ to their _$GOPATH_ directories
