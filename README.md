@@ -15,6 +15,9 @@ with acoustic feedback only and controllable via remote control vel sim.
 Usage 
 =====
 
+Commands
+--------
+
 As of now, _main.go_ recognizes the following commands from keyboard input:
 
 | Command (enter with newline) | Function |
@@ -24,6 +27,10 @@ As of now, _main.go_ recognizes the following commands from keyboard input:
 | `volup`   | Increase volume by 100 |
 | `voldown` | Decrease volume by 100 |
 | `alarm`   | Set up alarm (details see below) |
+
+
+Set up alarm (timer)
+------------
 
 
 Setting up an alarm (user input marked with `#`) and example alarm output:
