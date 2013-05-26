@@ -94,8 +94,8 @@ to the current tick time,
 it will stop the current _Player_, play this sound file and resume the _Player_.
 
 
-Preliminaries/Setup/Howto
-=========================
+Setup
+=====
 
 Prepare Raspberry Pi
 --------------------
@@ -111,8 +111,8 @@ and [here](http://elinux.org/RPi_Easy_SD_Card_Setup#SD_card_setup) and by runnin
 Prepare _piradio_
 -----------------
 * Install package _JsonConfigReader_ from [DisposaBoy](https://github.com/DisposaBoy/JsonConfigReader): `go get github.com/DisposaBoy/JsonConfigReader`
-* In your _$GOPATH_, make subdirectories _player/_, _sayer/_, _alarm/_ 
-* Copy _player.go_, _sayer.go_ and _alarm.go_ to their _$GOPATH_ directories
+* In your _$GOPATH/src_, make subdirectories _player/_, _sayer/_, _alarm/_ (this may vary for different Go setups...) 
+* Copy _player.go_, _sayer.go_ and _alarm.go_ to their respective directories under _$GOPATH/src_
 * Install packages:
 
 ```bash
@@ -121,13 +121,13 @@ go install sayer
 go install alarm
 ```
 
-* Populate your _streams.list_
+* Populate your _streams.list_, one URL per line
 * Acquire some sounds for alarm ticks with, e.g.,
 
 ```bash
 mplayer -really-quiet -noconsolecontrols \
   -dumpaudio -dumpfile 1m30s.mp3 \
-  "http://translate.google.com/translate_tts?tl=en&q=one+minute+thirty+seconds+left"
+  "http://translate.google.com/translate_tts?tl=en&q=1+minute+30+seconds+left"
 ```
 
 * Add sound file names and paths to your _sounds.json_, accordingly
