@@ -19,7 +19,7 @@ As of now, _main.go_ recognizes the following commands from keyboard input:
 
 | Command (enter with newline) | Function |
 |:--------|:------------|
-| `next`    | Quit currently playing stream and start next one         |
+| `next`    | Quit currently playing stream and start next in list        |
 | `quit`    | Quit main executable |
 | `volup`   | Increase volume by 100 |
 | `voldown` | Decrease volume by 100 |
