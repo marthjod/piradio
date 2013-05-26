@@ -51,8 +51,8 @@ Resuming player
 What's missing
 ==============
 
-In the future, it should be possible to acquire input by more comfortable means than typing commands on  
-a keyboard; for example, via remote control. 
+In the future, it should be possible to acquire input by more comfortable means than typing commands on  a keyboard; 
+for example, via remote control. 
 Also, feedback to the user should only be acoustic (controlling _piradio_ without having to look at it).
 
 Internals
@@ -89,7 +89,7 @@ Alarms run for a total duration and start ticking after each interval after a ce
 has passed. For example, you can set an alarm which will ring after 2 minutes 30 seconds and will start ticking
 every 10 seconds when 1 minute is left (i.e. after 1 minute 30 seconds). If it finds a sound file mapped 
 to the current tick time,
-it will stop the current Player, play this sound file and resume the Player.
+it will stop the current _Player_, play this sound file and resume the _Player_.
 
 
 Preliminaries/Setup/Howto
