@@ -10,10 +10,10 @@ Description
 
 **piradio** provides convenience wrapper functions for playing and controlling network streams 
 via [VLC media player](http://www.videolan.org/vlc/). Ideally, it should become usable
-with acoustic feedback only.
+with acoustic feedback only and controllable via remote control vel sim.
 
 
-As of now, it recognizes the following commands from keyboard input:
+As of now, _main.go_ recognizes the following commands from keyboard input:
 
 | Command (enter with newline) | Function |
 |:--------|:------------|
@@ -24,7 +24,7 @@ As of now, it recognizes the following commands from keyboard input:
 | `alarm`   | Set up alarm (details see below) |
 
 
-Setting up an alarm (user input marked with `#`) and alarm output:
+Setting up an alarm (user input marked with `#`) and example alarm output:
 
 ```bash
 alarm #
@@ -65,7 +65,7 @@ and _Alarm_ objects for handling timers.
 Streams
 -------
 
-Streams are read from _streams.list_ (containing one network stream URL per line) 
+Network stream URLs are read from _streams.list_ (containing one network stream URL per line) 
 and played in the file's order. If the last stream is reached, the next stream
 will be the first one in the list again.
 
