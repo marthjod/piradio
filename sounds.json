@@ -1,0 +1,20 @@
+{
+	"30s":	"sounds/30s.mp3",
+	"1m0s":	"sounds/1m0s.mp3",
+	"1m30s":	"sounds/1m30s.mp3",
+	"2m0s":	"sounds/2min0s.mp3",
+	"2m30s":	"sounds/2m30s.mp3",
+	"3m0s":	"sounds/3m0s.mp3",
+	"4m0s":	"sounds/4m0s.mp3",
+	"5m0s":	"sounds/5m0s.mp3",
+	"6m0s":	"sounds/6m0s.mp3",
+	"7m0s":	"sounds/7m0s.mp3",
+	"8m0s":	"sounds/8m0s.mp3",
+	"9m0s":	"sounds/9m0s.mp3",
+	"10m0s":	"sounds/10m0s.mp3",
+	"alarm":	"sounds/alarm.mp3",
+	"problem":	"sounds/problem.mp3",
+	"keine socketverbindung":	"sounds/no_socket_conn.mp3",
+	"fehler bei playerstart":	"sounds/err_start_player.mp3",
+	"player beendet":	"sounds/player_quit.mp3"
+}
