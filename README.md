@@ -94,7 +94,7 @@ _Sayer_ objects must be initialized with a valid path to a _sounds.json_.
 Alarms
 ------
 
-Alarms run for a total duration and start ticking after each interval after a certain amount of time 
+Alarms run for a total duration and start ticking after each interval (simulating a countdown) after a certain amount of time 
 has passed. For example, you can set an alarm which will ring after 2 minutes 30 seconds and will start ticking
 every 10 seconds when 1 minute is left (i.e. after 1 minute 30 seconds). If it finds a sound file mapped 
 to the current tick time,
