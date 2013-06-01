@@ -4,125 +4,68 @@ import (
 	"alarm"
 	"bufio"
 	"fmt"
-	"log"
 	"os"
+	"os/exec"
 	"player"
 	"sayer"
-	"strings"
-	"time"
 )
 
 var (
-	s      *sayer.Sayer
-	p      *player.Player
-	a      *alarm.Alarm
-	reader *bufio.Reader
-	err    error
-	line   []byte
+	s           *sayer.Sayer
+	p           *player.Player
+	a           *alarm.Alarm
+	reader      *bufio.Reader
+	err         error
+	inputKeyBuf [1]byte
+	inputCmd    *exec.Cmd
 )
-
-func ReadStdin(msg string) (string, error) {
-	var (
-		stdin *bufio.Reader
-	)
-
-	stdin = bufio.NewReader(os.Stdin)
-	fmt.Print(msg)
-	line, err = stdin.ReadBytes('\n')
-
-	return strings.TrimRight(string(line), "\n"), err
-
-}
-
-func GetTimeParam(msg string) (time.Duration, error) {
-	var (
-		duration time.Duration
-		buf      string
-		err      error
-	)
-
-	err = nil
-	duration = time.Since(time.Now())
-
-	if buf, err = ReadStdin(msg); err == nil {
-		duration, err = time.ParseDuration(buf)
-	}
-
-	return duration, err
-}
-
-func GetAlarmParams() (time.Duration, time.Duration, time.Duration, error) {
-	var (
-		total     time.Duration
-		tickBegin time.Duration
-		tickStep  time.Duration
-		err       error
-	)
-
-	total, err = GetTimeParam("Total: ")
-	if err != nil {
-		log.Println(err)
-	} else {
-
-		tickBegin, err = GetTimeParam("Start ticking at ... left: ")
-		if err != nil {
-			log.Println(err)
-		} else {
-
-			tickStep, err = GetTimeParam("Tick every ...: ")
-			if err != nil {
-				log.Println(err)
-			}
-		}
-	}
-
-	if err == nil {
-		log.Printf("Alarm params: total = %v, begin ticking at %v left, tick every %v", total.String(), tickBegin.String(), tickStep.String())
-	}
-
-	return total, tickBegin, tickStep, err
-}
 
 func main() {
 	reader = bufio.NewReader(os.Stdin)
 	s = sayer.NewSayer("sounds.json")
 	p = player.NewPlayer("streams.list")
-	//a = alarm.NewAlarm(2*time.Minute, 1*time.Minute+40*time.Second, 5*time.Second, s, p)
+
+	/*	for getchar()-like behavior cf.
+		http://osdir.com/ml/go-language-discuss/2013-03/msg00081.html
+	*/
+	inputCmd = exec.Command("/bin/stty", "-F", "/dev/tty", "-icanon", "min", "1")
 	for {
-		if line, err = reader.ReadBytes('\n'); err == nil {
-			// line is []byte
-			switch string(line) {
-			case "volup\n":
-				go p.VolumeUp(100)
-			case "voldown\n":
-				go p.VolumeDown(100)
-			case "next\n":
+		// run (and wait for completion)
+		inputCmd.Run()
+		if _, err = os.Stdin.Read(inputKeyBuf[0:1]); err == nil {
+			// TODO compare bytes directly
+			switch string(inputKeyBuf[0]) {
+			case "0":
+				go p.VolumeUp(20)
+			case ",":
+				go p.VolumeDown(20)
+			case "+":
 				go p.NextStream()
 			// switching through numbers one by one is presumably faster
-			case "1\n":
+			case "1":
 				go p.NextStreamByNumber(1)
-			case "2\n":
+			case "2":
 				go p.NextStreamByNumber(2)
-			case "3\n":
+			case "3":
 				go p.NextStreamByNumber(3)
-			case "4\n":
+			case "4":
 				go p.NextStreamByNumber(4)
-			case "5\n":
+			case "5":
 				go p.NextStreamByNumber(5)
-			case "6\n":
+			case "6":
 				go p.NextStreamByNumber(6)
-			case "7\n":
+			case "7":
 				go p.NextStreamByNumber(7)
-			case "8\n":
+			case "8":
 				go p.NextStreamByNumber(8)
-			case "9\n":
+			case "9":
 				go p.NextStreamByNumber(9)
-			case "alarm\n":
-				total, tickAfter, tickStep, err := GetAlarmParams()
-				if err == nil {
-					a = alarm.NewAlarm(total, tickAfter, tickStep, s, p)
-				}
-			case "quit\n":
+			//case "alarm\n":
+			//	total, tickAfter, tickStep, err := GetAlarmParams()
+			//	if err == nil {
+			//		a = alarm.NewAlarm(total, tickAfter, tickStep, s, p)
+			//	}
+			case "-":
 				p.Quit()
 				os.Exit(0)
 			}
