@@ -20,7 +20,7 @@ Commands
 
 As of now, _main.go_ recognizes the following commands from keyboard/numpad-only input:
 
-| Command (enter with newline) | Function |
+| Command (entered without newline) | Function |
 |:--------|:------------|
 | `+`    | Quit currently playing stream and start next in list        |
 | `1` through `9` | If available and not already playing, play stream no. `<number>` in _streams.list_ |
