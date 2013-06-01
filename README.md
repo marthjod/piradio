@@ -18,21 +18,21 @@ Usage
 Commands
 --------
 
-As of now, _main.go_ recognizes the following commands from keyboard input:
+As of now, _main.go_ recognizes the following commands from keyboard/numpad-only input:
 
 | Command (enter with newline) | Function |
 |:--------|:------------|
-| `next`    | Quit currently playing stream and start next in list        |
-| Numbers `1` through `9` | If available and not already playing, play stream no. `<number>` in _streams.list_ |
-| `quit`    | Quit main executable |
-| `volup`   | Increase volume by 100 |
-| `voldown` | Decrease volume by 100 |
-| `alarm`   | Set up alarm (details see below) |
+| `+`    | Quit currently playing stream and start next in list        |
+| `1` through `9` | If available and not already playing, play stream no. `<number>` in _streams.list_ |
+| `-`    | Quit main executable |
+| `0`   | Increase volume |
+| `,` | Decrease volume |
 
 
 Set up alarm (timer)
 ------------
 
+**NB: Currently not featured in _main.go_**
 
 Setting up an alarm (user input marked with `#`) and example alarm output:
 
@@ -142,7 +142,7 @@ mplayer -really-quiet -noconsolecontrols \
 * Run _main.go_: `go run main.go`
 
 
-Example setup
+Example hardware setup
 -------------
 
 - Raspberry Pi
