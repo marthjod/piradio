@@ -90,6 +90,26 @@ func (p *Player) NextStream() {
 	p.Start()
 }
 
+func (p *Player) NextStreamByNumber(streamNo int) {
+
+	// input var streamNo is a human-friendly number
+	// (counting begins at 1, so the first stream in the list
+	// is the 0th array element and so on)
+	streamNo--
+
+	// only act if requested stream is not already playing
+	if p.currentStreamNo != streamNo {
+		// look if stream with requested number
+		// even exists; only then quit current player
+		if streamNo <= len(p.streamsList)-1 {
+			p.Quit()
+			p.currentStreamNo = streamNo
+			p.Start()
+		}
+		// else do nothing
+	}
+}
+
 func (p *Player) GetVolume() int {
 	return p.volume
 }

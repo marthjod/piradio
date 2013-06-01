@@ -85,8 +85,8 @@ func GetAlarmParams() (time.Duration, time.Duration, time.Duration, error) {
 
 func main() {
 	reader = bufio.NewReader(os.Stdin)
-	s = sayer.NewSayer("/tmp/kradio/sounds.json")
-	p = player.NewPlayer("/tmp/kradio/streams.list")
+	s = sayer.NewSayer("sounds.json")
+	p = player.NewPlayer("streams.list")
 	//a = alarm.NewAlarm(2*time.Minute, 1*time.Minute+40*time.Second, 5*time.Second, s, p)
 	for {
 		if line, err = reader.ReadBytes('\n'); err == nil {
@@ -98,6 +98,25 @@ func main() {
 				go p.VolumeDown(100)
 			case "next\n":
 				go p.NextStream()
+			// switching through numbers one by one is presumably faster
+			case "1\n":
+				go p.NextStreamByNumber(1)
+			case "2\n":
+				go p.NextStreamByNumber(2)
+			case "3\n":
+				go p.NextStreamByNumber(3)
+			case "4\n":
+				go p.NextStreamByNumber(4)
+			case "5\n":
+				go p.NextStreamByNumber(5)
+			case "6\n":
+				go p.NextStreamByNumber(6)
+			case "7\n":
+				go p.NextStreamByNumber(7)
+			case "8\n":
+				go p.NextStreamByNumber(8)
+			case "9\n":
+				go p.NextStreamByNumber(9)
 			case "alarm\n":
 				total, tickAfter, tickStep, err := GetAlarmParams()
 				if err == nil {

@@ -10,9 +10,9 @@ Description
 
 **piradio** provides convenience wrapper functions for playing and controlling network streams 
 via [VLC media player](http://www.videolan.org/vlc/). Ideally, it should become usable
-with acoustic feedback only and controllable via remote control vel sim.
+with acoustic feedback only and controllable via remote control, a numpad vel sim.
 
-Usage 
+Usage
 =====
 
 Commands
@@ -23,6 +23,7 @@ As of now, _main.go_ recognizes the following commands from keyboard input:
 | Command (enter with newline) | Function |
 |:--------|:------------|
 | `next`    | Quit currently playing stream and start next in list        |
+| Numbers `1` through `9` | If available and not already playing, play stream no. `<number>` in _streams.list_ |
 | `quit`    | Quit main executable |
 | `volup`   | Increase volume by 100 |
 | `voldown` | Decrease volume by 100 |
@@ -60,8 +61,8 @@ Resuming player
 What's missing
 ==============
 
-In the future, it should be possible to acquire input by more comfortable means than typing commands on  a keyboard; 
-for example, via remote control. 
+In the future, it should be possible to acquire input by more comfortable means than typing commands on a full keyboard; 
+for example, via remote control or a numpad only.
 Also, feedback to the user should only be acoustic (controlling _piradio_ without having to look at it).
 
 Internals
@@ -139,3 +140,13 @@ mplayer -really-quiet -noconsolecontrols \
 
 * Add sound file names and paths to your _sounds.json_, accordingly
 * Run _main.go_: `go run main.go`
+
+
+Example setup
+-------------
+
+- Raspberry Pi
+- AC adapter (2000 mA)
+- USB numpad
+- USB WiFi dongle
+- SD card
