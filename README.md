@@ -10,7 +10,7 @@ Description
 
 **piradio** provides convenience wrapper functions for playing and controlling network streams 
 via [VLC media player](http://www.videolan.org/vlc/). Ideally, it should become usable
-with acoustic feedback only and controllable via remote control, a numpad vel sim.
+with acoustic feedback only and controllable via remote control, a numpad, vel sim.
 
 Usage
 =====
@@ -29,8 +29,77 @@ As of now, _main.go_ recognizes the following commands from keyboard/numpad-only
 | `,` | Decrease volume |
 
 
-Set up alarm (timer)
-------------
+
+Config file
+-----------
+
+The config file serves as an external interface for setting run-time options.
+Its format follows the _gitconfig_ or, more specifically, [gcfg](https://code.google.com/p/gcfg/) format
+which is based on the .ini-file style.
+Until now, it looks like this:
+
+_piradio.ini_:
+
+```ini
+# Path to streams.list file
+[Streams]
+StreamsList = streams.list
+
+# Path to (JSON) file containing sounds mappings
+# (used by Alarms)
+[Sounds]
+SoundsFile = sounds.json
+
+[Volume]
+VolUpStep = 20
+VolDownStep = 20
+
+```
+
+What's missing
+==============
+
+Feedback to the user should only be acoustic, thus making it possible to control _piradio_ without having to look at it.
+
+Internals
+=========
+
+Internally, we use _Player_ objects to play a stream, 
+_Sayer_ objects to play sound files (which act as alarm tick messages) 
+and _Alarm_ objects for handling timers.
+
+Streams
+-------
+
+Network stream URLs are read from a streams list file (containing one URL per line) 
+and played starting at its first entry.
+Switch to another stream by typing the new stream's list number (number keys _1_-_9_).
+The streams list consequently has a 9-entry limit (advantage: only one keystroke necessary for switching streams).
+Numbers not mapped to an entry are ignored.
+
+_Player_ objects must be initialized with a valid path to a _streams.list_.
+
+Sounds
+------
+
+Sound files are needed for acoustic feedback (alarm ringing, alarm tick messages, error messages).
+They are best placed in a _sounds/_ subdirectory with corresponding mappings in a JSON-formatted sound map file (e.g., _sounds.json_).
+
+_Sayer_ objects must be initialized with a valid path to a _sounds.json_ and a pre-existing _Player_ object to interrupt if need be.
+
+
+
+
+Alarms
+------
+
+Alarms run for a total duration and start ticking after each interval (simulating a countdown) after a certain amount of time 
+has passed. For example, you can set an alarm which will ring after 2 minutes 30 seconds and will start ticking
+every 10 seconds when 1 minute is left (i.e. after 1 minute 30 seconds). If it finds a sound file mapped 
+to the current tick time,
+it will stop the current _Player_, play this sound file and resume the _Player_.
+
+### Set up alarm (timer)
 
 **NB: Currently not featured in _main.go_**
 
@@ -58,49 +127,6 @@ Ringing alarm
 Resuming player
 ```
 
-What's missing
-==============
-
-In the future, it should be possible to acquire input by more comfortable means than typing commands on a full keyboard; 
-for example, via remote control or a numpad only.
-Also, feedback to the user should only be acoustic (controlling _piradio_ without having to look at it).
-
-Internals
-=========
-
-Internally, we use _Player_ objects to play a stream, 
-_Sayer_ objects to play sound files (which act as alarm tick messages) 
-and _Alarm_ objects for handling timers.
-
-Streams
--------
-
-Network stream URLs are read from _streams.list_ (containing one network stream URL per line) 
-and played in the file's order. If the last stream is reached, the next stream
-will be the first one in the list again.
-
-_Player_ objects must be initialized with a valid path to a _streams.list_.
-
-Sounds
-------
-
-Sound files are needed for acoustic feedback (alarm ringing, alarm tick messages, error messages).
-They are best placed in a _sounds/_ subdirectory with corresponding mappings in _sounds.json_.
-
-_Sayer_ objects must be initialized with a valid path to a _sounds.json_.
-
-
-
-
-Alarms
-------
-
-Alarms run for a total duration and start ticking after each interval (simulating a countdown) after a certain amount of time 
-has passed. For example, you can set an alarm which will ring after 2 minutes 30 seconds and will start ticking
-every 10 seconds when 1 minute is left (i.e. after 1 minute 30 seconds). If it finds a sound file mapped 
-to the current tick time,
-it will stop the current _Player_, play this sound file and resume the _Player_.
-
 
 Setup
 =====
@@ -119,6 +145,7 @@ and [here](http://elinux.org/RPi_Easy_SD_Card_Setup#SD_card_setup) and by runnin
 Prepare _piradio_
 -----------------
 * Install package _JsonConfigReader_ from [DisposaBoy](https://github.com/DisposaBoy/JsonConfigReader): `go get github.com/DisposaBoy/JsonConfigReader`
+* Install package [_gcfg_](https://code.google.com/p/gcfg): `go get code.google.com/p/gcfg`
 * In your _$GOPATH/src_, make subdirectories _player/_, _sayer/_, _alarm/_ (this may vary for different Go setups...) 
 * Copy _player.go_, _sayer.go_ and _alarm.go_ to their respective directories under _$GOPATH/src_
 * Install packages:
@@ -139,7 +166,10 @@ mplayer -really-quiet -noconsolecontrols \
 ```
 
 * Add sound file names and paths to your _sounds.json_, accordingly
-* Run _main.go_: `go run main.go`
+* Run _main.go_
+	* `go run main.go` or
+	* `go run main.go --config=/path/to/piradio.ini`
+
 
 
 Example hardware setup

@@ -40,16 +40,17 @@ func NewAlarm(totalDuration time.Duration, tickBegin time.Duration,
 	return a
 }
 
+//TODO see if "a *Alarm" is (more) correct here
 func (a Alarm) Ring() {
 	log.Println("Ringing alarm")
-	a.sayer.Say(a.player, "alarm")
+	a.sayer.Say("alarm")
 }
 
 func (a *Alarm) Tick(timeLeft time.Duration) {
 	log.Printf("*tick* (time left: %v)", timeLeft.String())
 	// if string representation of time left
 	// is found in sounds map, say it
-	a.sayer.Say(a.player, timeLeft.String())
+	a.sayer.Say(timeLeft.String())
 }
 
 /* 	interval grows,

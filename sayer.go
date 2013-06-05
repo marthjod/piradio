@@ -25,16 +25,18 @@ type Sayer struct {
 	quitItem   string
 	soundsFile string
 	soundsMap  map[string]string
+	player     *player.Player
 }
 
 // constructor
-func NewSayer(soundsFile string) *Sayer {
+func NewSayer(soundsFile string, player *player.Player) *Sayer {
 	s := new(Sayer)
 	// alias for vlc --intf=dummy
 	s.executable = "/usr/bin/cvlc"
 	s.quitItem = "vlc://quit"
 	s.soundsFile = soundsFile
 	s.soundsMap = readMap(s.soundsFile)
+	s.player = player
 	return s
 }
 
@@ -46,7 +48,7 @@ func NewSayer(soundsFile string) *Sayer {
 	one-instance-when-started-from-file=0
 	to avoid the sayer instance interfering with the player instance
 */
-func (s *Sayer) Say(player *player.Player, messages ...string) {
+func (s *Sayer) Say(messages ...string) {
 	var (
 		cmd *exec.Cmd
 		err error
@@ -54,14 +56,14 @@ func (s *Sayer) Say(player *player.Player, messages ...string) {
 	for _, sentence := range messages {
 		for key, val := range s.soundsMap {
 			if key == sentence {
-				player.Quit()
-				log.Printf("%s %s %s", s.executable, "--volume="+strconv.Itoa(player.GetVolume()), val)
+				s.player.Quit()
+				log.Printf("%s %s %s", s.executable, "--volume="+strconv.Itoa(s.player.GetVolume()), val)
 
 				// say message and force vlc to quit right away
-				cmd = exec.Command(s.executable, "--volume="+strconv.Itoa(player.GetVolume()), val, s.quitItem)
+				cmd = exec.Command(s.executable, "--volume="+strconv.Itoa(s.player.GetVolume()), val, s.quitItem)
 				// Run() waits for cmd to finish
 				cmd.Run()
-				err = player.Resume()
+				err = s.player.Resume()
 				if err != nil {
 					log.Println(err)
 				}
