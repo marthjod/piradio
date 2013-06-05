@@ -73,11 +73,11 @@ Streams
 
 Network stream URLs are read from a streams list file (containing one URL per line) 
 and played starting at its first entry.
-Switch to another stream by typing the new stream's list number (number keys _1_-_9_).
+Switch to another stream by typing the new stream's list number (number keys `1`-`9`).
 The streams list consequently has a 9-entry limit (advantage: only one keystroke necessary for switching streams).
 Numbers not mapped to an entry are ignored.
 
-_Player_ objects must be initialized with a valid path to a _streams.list_.
+_Player_ objects must be initialized with a valid path to a streams list.
 
 Sounds
 ------
