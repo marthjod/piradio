@@ -175,7 +175,7 @@ mplayer -really-quiet -noconsolecontrols \
 	* `go run main.go --config=/path/to/piradio.ini`
 
 * Find out the device name for the attached input device and map key codes, if needed (see [Bash script](https://github.com/marthjod/piradio/blob/master/getkey.sh))
-* For autostart, put a SysV Init script in _/etc/init.d/_ and update runlevel configuration (`sudo update-rc.d piradio defaults`)
+* For autostart, put a [SysV Init script](https://github.com/marthjod/piradio/blob/master/piradio-sysv-init) in _/etc/init.d/_ and update runlevel configuration (`sudo update-rc.d piradio defaults`)
 
 
 Example hardware setup
