@@ -22,11 +22,15 @@ As of now, _main.go_ recognizes the following commands from keyboard/numpad-only
 
 | Command (entered without newline) | Function |
 |:--------|:------------|
-| `+`    | Quit currently playing stream and start next in list        |
 | `1` through `9` | If available and not already playing, play stream no. `<number>` in _streams.list_ |
-| `-`    | Quit main executable |
-| `0`   | Increase volume |
-| `,` | Decrease volume |
+| `<backspace>`    | Quit main executable |
+| `+`   | Increase volume |
+| `-` | Decrease volume |
+
+However, keyboard input depends on an underlying [Bash script](https://github.com/marthjod/piradio/blob/master/getkey.sh)
+which can always monitor a specific input device.
+Because we want to be able to run _piradio_ automatically, without a terminal attached, we need an external
+helper process returning information about a key pressed to _main.go_.
 
 
 
@@ -90,7 +94,7 @@ _Sayer_ objects must be initialized with a valid path to a _sounds.json_ and a p
 
 
 
-Alarms
+Alarms (disabled fttb)
 ------
 
 Alarms run for a total duration and start ticking after each interval (simulating a countdown) after a certain amount of time 
@@ -157,7 +161,7 @@ go install alarm
 ```
 
 * Populate your _streams.list_, one URL per line
-* Acquire some sounds for alarm ticks with, e.g.,
+* (Alarms) Acquire some sounds for alarm ticks with, e.g.,
 
 ```bash
 mplayer -really-quiet -noconsolecontrols \
@@ -165,11 +169,13 @@ mplayer -really-quiet -noconsolecontrols \
   "http://translate.google.com/translate_tts?tl=en&q=1+minute+30+seconds+left"
 ```
 
-* Add sound file names and paths to your _sounds.json_, accordingly
+* (Alarms) Add sound file names and paths to your _sounds.json_, accordingly
 * Run _main.go_
 	* `go run main.go` or
 	* `go run main.go --config=/path/to/piradio.ini`
 
+* Find out the device name for the attached input device and map key codes, if needed (see [Bash script](https://github.com/marthjod/piradio/blob/master/getkey.sh))
+* For autostart, put a SysV Init script in _/etc/init.d/_ and update runlevel configuration (`sudo update-rc.d piradio defaults`)
 
 
 Example hardware setup
