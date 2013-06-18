@@ -6,10 +6,11 @@ import (
 	"code.google.com/p/gcfg"
 	"fmt"
 	"os"
-	"os/exec"
 	"player"
 	// "sayer"
 	"flag"
+	"strconv"
+	"strings"
 )
 
 /*	the expected config file key-value structure;
@@ -48,17 +49,46 @@ type Config struct {
 	}
 }
 
+/*	uses an underlying Bash script for acquiring keyboard input
+	TODO this is presumably slow
+*/
+func GetKey(externalCmd string) int64 {
+	var (
+		proc      *os.Process
+		procAttr  os.ProcAttr
+		procState *os.ProcessState
+		inputKey  int64
+		err       error
+	)
+
+	inputKey = 0
+
+	procAttr.Files = []*os.File{nil, nil, nil}
+	proc, err = os.StartProcess(externalCmd, []string{""}, &procAttr)
+	procState, err = proc.Wait()
+
+	/*	we expect information via exit statuses (i.e., error codes)
+		from the system script
+	 */
+	inputKey, err = strconv.ParseInt(strings.TrimPrefix(procState.String(), "exit status "), 10, 64)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return inputKey
+}
+
 func main() {
 
 	var (
 		// a           *alarm.Alarm
 		// s           *sayer.Sayer
-		p           *player.Player
-		err         error
-		inputKeyBuf [1]byte
-		inputCmd    *exec.Cmd
-		conf        Config
-		confFile    string
+		p        *player.Player
+		err      error
+		inputKey int64
+		conf     Config
+		confFile string
+		getKeyCmd string
 	)
 
 	flag.StringVar(&confFile, "config", "piradio.ini",
@@ -74,59 +104,50 @@ func main() {
 		panic(err)
 	}
 
+	// TODO add to config
+	getKeyCmd = "./getkey.sh"
+
 	p = player.NewPlayer(conf.Streams.StreamsList)
 	/*	Sayer and Alarm DISABLED FOR NOW
 		s = sayer.NewSayer(conf.Sounds.SoundsFile, p)
 		s will be used fo Alarm a (see below)
 	*/
 
-	/*	simulate getchar()-like behavior, cf.
-		http://osdir.com/ml/go-language-discuss/2013-03/msg00081.html
-	*/
-	inputCmd = exec.Command("/bin/stty", "-F", "/dev/tty", "-icanon", "min", "1")
-
 	for {
-		// run (and wait for completion)
-		inputCmd.Run()
-		if _, err = os.Stdin.Read(inputKeyBuf[0:1]); err == nil {
-			switch inputKeyBuf[0] {
-			case '0':
-				go p.VolumeUp(conf.Volume.VolUpStep)
-			case ',':
-				go p.VolumeDown(conf.Volume.VolDownStep)
-			case '+':
-				go p.NextStream()
-			// switching through numbers one by one is presumably fastest,
-			// compiler- and performance-wise
-			case '1':
-				go p.NextStreamByNumber(1)
-			case '2':
-				go p.NextStreamByNumber(2)
-			case '3':
-				go p.NextStreamByNumber(3)
-			case '4':
-				go p.NextStreamByNumber(4)
-			case '5':
-				go p.NextStreamByNumber(5)
-			case '6':
-				go p.NextStreamByNumber(6)
-			case '7':
-				go p.NextStreamByNumber(7)
-			case '8':
-				go p.NextStreamByNumber(8)
-			case '9':
-				go p.NextStreamByNumber(9)
-			//case "alarm\n":
-			//	total, tickAfter, tickStep, err := GetAlarmParams()
-			//	if err == nil {
-			//		a = alarm.NewAlarm(total, tickAfter, tickStep, s, p)
-			//	}
-			case '-':
-				p.Quit()
-				os.Exit(0)
-			}
-		} else {
-			fmt.Println(err)
+		/*	run and wait for completion
+			it is ok that this blocks
+			because what else should we do in the meantime?
+			TODO unfortunately, this seems to block noticeably =(
+		*/
+		inputKey = GetKey(getKeyCmd)
+
+		switch inputKey {
+		case 11:
+			go p.VolumeUp(conf.Volume.VolUpStep)
+		case 12:
+			go p.VolumeDown(conf.Volume.VolDownStep)
+		case 1:
+			go p.NextStreamByNumber(1)
+		case 2:
+			go p.NextStreamByNumber(2)
+		case 3:
+			go p.NextStreamByNumber(3)
+		case 4:
+			go p.NextStreamByNumber(4)
+		case 5:
+			go p.NextStreamByNumber(5)
+		case 6:
+			go p.NextStreamByNumber(6)
+		case 7:
+			go p.NextStreamByNumber(7)
+		case 8:
+			go p.NextStreamByNumber(8)
+		case 9:
+			go p.NextStreamByNumber(9)
+		case 13:
+			p.Quit()
+			os.Exit(0)
 		}
 	}
+
 }
