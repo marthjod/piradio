@@ -1,0 +1,55 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:          piradio
+# Required-Start:    $all
+# Required-Stop:     
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start piradio at boot time
+# Description:       Start piradio at boot time
+### END INIT INFO
+
+APPDIR=/var/piradio
+APP=$APPDIR/main.go
+APPUSER=pi
+GOROOT=/home/pi/go
+GOPATH=/var/piradio
+GORUN="$GOROOT/bin/go run"
+
+# TODO there seems to be a bug preventing Go from finding
+# files not in the same dir (something with 'stat'...)
+#APP_OPTS="--config=/var/piradio/piradio.ini"
+
+# TODO probe for vlc, go, etc.
+
+case "$1" in
+
+	start)
+
+		# TODO cd'ing to $APPDIR is a temporary workaround (s.a.)
+		cd $APPDIR
+		echo "Starting $APP as user $APPUSER, GOPATH $GOPATH"
+		echo "$GORUN $APP"
+		su $APPUSER -c "GOPATH=$GOPATH; export GOPATH; $GORUN $APP &"
+		exit 0
+	;;
+	
+	stop)
+		echo "Stopping $APP..."
+		# TODO
+	;;
+	
+	restart)
+		# TODO
+		$0 stop
+		$0 start	
+	;;
+
+	*)
+		echo "Usage: /etc/init.d/$0 {start|stop}"
+		exit 1
+	;;
+	
+esac
+
