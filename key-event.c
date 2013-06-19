@@ -1,4 +1,13 @@
-/*	modified after
+/* 	acquire key events from input device ("key logger")
+	and write it (slightly modified) to fifo
+	where a partner program may fetch which key has been pressed
+	useful for headless mode, i.e. autostarted service must react to device input without
+	other than on its own tty
+	
+	run with, e.g. 
+	sudo ./key-event /dev/input/event5	
+	
+	modified after
 	http://www.thelinuxdaily.com/2010/05/grab-raw-keyboard-input-from-event-device-node-devinputevent/
 */
 
@@ -16,6 +25,10 @@
 #include <sys/time.h>
 #include <termios.h>
 #include <signal.h>
+
+
+// TODO named pipe's path via argv[2]
+
 
 int main (int argc, char *argv[]) {
 
