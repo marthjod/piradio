@@ -6,11 +6,13 @@ import (
 	"code.google.com/p/gcfg"
 	"fmt"
 	"os"
+	//	"os/exec"
 	"player"
 	// "sayer"
+	"bufio"
 	"flag"
-	"strconv"
 	"strings"
+	"syscall"
 )
 
 /*	the expected config file key-value structure;
@@ -33,6 +35,8 @@ import (
 	VolUpStep = 20
 	VolDownStep = 20
 
+	[IPC]
+	FifoPath = /tmp/gofifo
 	...
 	---
 */
@@ -47,35 +51,9 @@ type Config struct {
 		VolUpStep   int
 		VolDownStep int
 	}
-}
-
-/*	uses an underlying Bash script for acquiring keyboard input
-	TODO this is presumably slow
-*/
-func GetKey(externalCmd string) int64 {
-	var (
-		proc      *os.Process
-		procAttr  os.ProcAttr
-		procState *os.ProcessState
-		inputKey  int64
-		err       error
-	)
-
-	inputKey = 0
-
-	procAttr.Files = []*os.File{nil, nil, nil}
-	proc, err = os.StartProcess(externalCmd, []string{""}, &procAttr)
-	procState, err = proc.Wait()
-
-	/*	we expect information via exit statuses (i.e., error codes)
-		from the system script
-	 */
-	inputKey, err = strconv.ParseInt(strings.TrimPrefix(procState.String(), "exit status "), 10, 64)
-	if err != nil {
-		fmt.Println(err)
+	IPC struct {
+		FifoPath string
 	}
-
-	return inputKey
 }
 
 func main() {
@@ -85,10 +63,12 @@ func main() {
 		// s           *sayer.Sayer
 		p        *player.Player
 		err      error
-		inputKey int64
+		input    string
 		conf     Config
 		confFile string
-		getKeyCmd string
+		fifo     *os.File
+		//		keyEventListener *exec.Cmd
+		reader *bufio.Reader
 	)
 
 	flag.StringVar(&confFile, "config", "piradio.ini",
@@ -104,50 +84,72 @@ func main() {
 		panic(err)
 	}
 
-	// TODO add to config
-	getKeyCmd = "./getkey.sh"
-
 	p = player.NewPlayer(conf.Streams.StreamsList)
 	/*	Sayer and Alarm DISABLED FOR NOW
 		s = sayer.NewSayer(conf.Sounds.SoundsFile, p)
 		s will be used fo Alarm a (see below)
 	*/
 
-	for {
-		/*	run and wait for completion
-			it is ok that this blocks
-			because what else should we do in the meantime?
-			TODO unfortunately, this seems to block noticeably =(
-		*/
-		inputKey = GetKey(getKeyCmd)
+	// create named pipe
+	err = syscall.Mkfifo(conf.IPC.FifoPath, syscall.S_IFIFO|0666)
+	if err != nil {
+		fmt.Println(conf.IPC.FifoPath, err)
+	}
 
-		switch inputKey {
-		case 11:
-			go p.VolumeUp(conf.Volume.VolUpStep)
-		case 12:
-			go p.VolumeDown(conf.Volume.VolDownStep)
-		case 1:
-			go p.NextStreamByNumber(1)
-		case 2:
-			go p.NextStreamByNumber(2)
-		case 3:
-			go p.NextStreamByNumber(3)
-		case 4:
-			go p.NextStreamByNumber(4)
-		case 5:
-			go p.NextStreamByNumber(5)
-		case 6:
-			go p.NextStreamByNumber(6)
-		case 7:
-			go p.NextStreamByNumber(7)
-		case 8:
-			go p.NextStreamByNumber(8)
-		case 9:
-			go p.NextStreamByNumber(9)
-		case 13:
-			p.Quit()
-			os.Exit(0)
+	fifo, err = os.Open(conf.IPC.FifoPath)
+	if err != nil {
+		fmt.Printf("Could not acquire control input from %s, aborting (%s).",
+			conf.IPC.FifoPath, err)
+		os.Exit(1)
+	}
+
+	/*
+		keyEventListener = exec.Command("sudo", "./key-event", "/dev/input/event0")
+		err = keyEventListener.Start()
+		if err != nil {
+			fmt.Printf("Could not start key event listener, aborting.")
+			os.Exit(1)
 		}
+	*/
+
+	reader = bufio.NewReader(fifo)
+
+	for {
+
+		if input, err = reader.ReadString('\n'); err == nil {
+			input = strings.TrimRight(input, "\n")
+			// fmt.Printf("Got key [%v]\n", input)
+
+			switch input {
+			case "78":
+				go p.VolumeUp(conf.Volume.VolUpStep)
+			case "74":
+				go p.VolumeDown(conf.Volume.VolDownStep)
+			case "79":
+				go p.NextStreamByNumber(1)
+			case "80":
+				go p.NextStreamByNumber(2)
+			case "81":
+				go p.NextStreamByNumber(3)
+			case "75":
+				go p.NextStreamByNumber(4)
+			case "76":
+				go p.NextStreamByNumber(5)
+			case "77":
+				go p.NextStreamByNumber(6)
+			case "71":
+				go p.NextStreamByNumber(7)
+			case "72":
+				go p.NextStreamByNumber(8)
+			case "73":
+				go p.NextStreamByNumber(9)
+			case "14":
+				p.Quit()
+				os.Exit(0)
+			}
+
+		}
+
 	}
 
 }
