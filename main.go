@@ -127,29 +127,30 @@ func main() {
 
 				switch input {
 				case "78":
-					go p.VolumeUp(conf.Volume.VolUpStep)
+					p.VolumeUp(conf.Volume.VolUpStep)
 				case "74":
-					go p.VolumeDown(conf.Volume.VolDownStep)
+					p.VolumeDown(conf.Volume.VolDownStep)
 				case "79":
-					go p.NextStreamByNumber(1)
+					p.NextStreamByNumber(1)
 				case "80":
-					go p.NextStreamByNumber(2)
+					p.NextStreamByNumber(2)
 				case "81":
-					go p.NextStreamByNumber(3)
+					p.NextStreamByNumber(3)
 				case "75":
-					go p.NextStreamByNumber(4)
+					p.NextStreamByNumber(4)
 				case "76":
-					go p.NextStreamByNumber(5)
+					p.NextStreamByNumber(5)
 				case "77":
-					go p.NextStreamByNumber(6)
+					p.NextStreamByNumber(6)
 				case "71":
-					go p.NextStreamByNumber(7)
+					p.NextStreamByNumber(7)
 				case "72":
-					go p.NextStreamByNumber(8)
+					p.NextStreamByNumber(8)
 				case "73":
-					go p.NextStreamByNumber(9)
+					p.NextStreamByNumber(9)
 				case "14":
 					p.Quit()
+					fmt.Println("Quit")
 					os.Exit(0)
 				}
 			}
