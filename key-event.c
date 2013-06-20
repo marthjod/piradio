@@ -78,12 +78,11 @@ int main (int argc, char *argv[]) {
 	  	if (value != ' ' && ev[1].value == 1 && ev[1].type == 1) {
 	   		// printf("code [%d]\n", (ev[1].code));
 	   		
-	   		// convert key code to string "<code>\n" 
-	   		// (more convenient for reciever)
-	   		snprintf(key, 4, "%d\n", (ev[1].code));
+	   		// convert key code to string "<code>" 
+	   		snprintf(key, 4, "%d", (ev[1].code));
 	   		// printf("key is now %s\n", key);
 	   		
-	   	    // write string to named pipe
+	   	        // write string to named pipe (fifo)
 			pipe = open(fifo, O_WRONLY);
 			write(pipe, key, 4);
 			close(pipe);
