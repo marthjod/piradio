@@ -30,8 +30,13 @@ As of now, _main.go_ recognizes the following commands from keyboard/numpad-only
 | `0` | Increase countdown time by 10 minutes |
 | `000` | Increase countdown time by 1 minute |
 
+
+Input
+------
+
+
 Because we want to be able to run _piradio_ without a terminal attached (think autostarted daemon), we need an external
-helper process providing us with information about key press events ("key logger").
+helper process providing us with information about key press events ("keylogger").
 [key-event.c](https://github.com/marthjod/piradio/blob/master/key-event.c) (called with the correct
 input device as argument, e.g. `./key-event /dev/input/event0`) catches key events and writes them to 
 a FIFO (named pipe), from which _main.go_ in turn retrieves them. The path to this FIFO must be configured in 
@@ -62,15 +67,11 @@ SoundsFile = sounds.json
 VolUpStep = 20
 VolDownStep = 20
 
+# Path to named pipe used for retrieving codes of pressed keys
 [IPC]
 FifoPath = /tmp/gofifo
-
 ```
 
-What's missing
-==============
-
-Feedback to the user should only be acoustic, thus making it possible to control _piradio_ without having to look at it.
 
 Internals
 =========
@@ -132,12 +133,10 @@ Prepare _piradio_
 * Install package [_gcfg_](https://code.google.com/p/gcfg): `go get code.google.com/p/gcfg`
 * In your _$GOPATH/src_, make subdirectories _player/_, _sayer/_, _alarm/_ (this may vary for different Go setups...) 
 * Copy _player.go_, _sayer.go_ and _alarm.go_ to their respective directories under _$GOPATH/src_
-* Install packages:
+* Install packages: 
 
 ```bash
-go install player
-go install sayer
-go install alarm
+for pkg in player sayer alarm; do go install $pkg; done
 ```
 * Populate your _streams.list_, one URL per line
 * (Alarms) Acquire some sounds for alarm ticks with, e.g.,
@@ -153,6 +152,7 @@ mplayer -really-quiet -noconsolecontrols \
 	* **DOES NOT WORK YET** `go run main.go --config=/path/to/piradio.ini`
 * For autostart, put a [SysV Init script](https://github.com/marthjod/piradio/blob/master/piradio-sysv-init) in _/etc/init.d/_ and update runlevel configuration (`sudo update-rc.d piradio defaults`)
 * Compile the "keylogger" (`gcc -o key-event key-event.c`) and add the appropriate call to the init script
+
 > NB: the "keylogger" is only intended for a headless Raspberry Pi with no other uses, so this does not invade the user's privacy; also, the 
 FIFO gets emptied whenever read, so not even the user's stream choices etc. "touch ground"...
 
