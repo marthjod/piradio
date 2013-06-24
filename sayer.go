@@ -26,6 +26,7 @@ type Sayer struct {
 	soundsFile string
 	soundsMap  map[string]string
 	player     *player.Player
+	volume     int
 }
 
 // constructor
@@ -37,6 +38,8 @@ func NewSayer(soundsFile string, player *player.Player) *Sayer {
 	s.soundsFile = soundsFile
 	s.soundsMap = readMap(s.soundsFile)
 	s.player = player
+	// sayer should be louder
+	s.volume = player.GetVolume() + 50
 	return s
 }
 
@@ -57,10 +60,9 @@ func (s *Sayer) Say(messages ...string) {
 		for key, val := range s.soundsMap {
 			if key == sentence {
 				s.player.Quit()
-				log.Printf("%s %s %s", s.executable, "--volume="+strconv.Itoa(s.player.GetVolume()), val)
-
+				log.Printf("%s %s %s", s.executable, "--volume="+strconv.Itoa(s.volume), val)
 				// say message and force vlc to quit right away
-				cmd = exec.Command(s.executable, "--volume="+strconv.Itoa(s.player.GetVolume()), val, s.quitItem)
+				cmd = exec.Command(s.executable, "--volume="+strconv.Itoa(s.volume), val, s.quitItem)
 				// Run() waits for cmd to finish
 				cmd.Run()
 				err = s.player.Resume()
@@ -76,9 +78,8 @@ func (s *Sayer) Say(messages ...string) {
 
 /* 	sounds.json:
 {	
-	"30s":	"sounds/30s.mp3",
 	"1m0s":	"sounds/1m0s.mp3",
-	"1m30s":	"sounds/1m30s.mp3",
+	"10m0s":	"sounds/10m0s.mp3",
 	"problem":	"sounds/problem.mp3"
 }
 
@@ -86,6 +87,15 @@ func (s *Sayer) Say(messages ...string) {
 
 	mplayer -really-quiet -noconsolecontrols -dumpaudio -dumpfile $w.mp3 \
 		"http://translate.google.com/translate_tts?tl=de&q=$w"
+
+	above json format from directory listing (use only up to "59m0s"):
+
+	find sounds/ -type f -name '*.mp3' |
+	perl -ne ' my $line = $_;
+		$line =~ s#^sounds/(\d+m0s)\.mp3$#$1#;
+		chomp($_);
+		chomp($line);
+		print "\t\"$line\": \"$_\",\n" '
 */
 func readMap(inFile string) map[string]string {
 	var (

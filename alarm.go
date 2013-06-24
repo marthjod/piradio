@@ -15,27 +15,16 @@ import (
 )
 
 type Alarm struct {
-	totalDuration time.Duration
-	tickBegin     time.Duration
-	tickStep      time.Duration
-	sayer         *sayer.Sayer
-	player        *player.Player
+	sayer  *sayer.Sayer
+	player *player.Player
 }
 
-func NewAlarm(totalDuration time.Duration, tickBegin time.Duration,
-	tickStep time.Duration, sayer *sayer.Sayer, player *player.Player) *Alarm {
+func NewAlarm(sayer *sayer.Sayer, player *player.Player) *Alarm {
 
 	a := new(Alarm)
 
-	// TODO sanity checks if values are reasonable
-	a.totalDuration = totalDuration
-	a.tickBegin = tickBegin
-	a.tickStep = tickStep
 	a.sayer = sayer
 	a.player = player
-
-	// start alarm right away
-	a.Start()
 
 	return a
 }
@@ -56,13 +45,14 @@ func (a *Alarm) Tick(timeLeft time.Duration) {
 /* 	interval grows,
 time timeLeft shrinks
 */
-func (a *Alarm) Start() {
+func (a *Alarm) Start(totalDuration time.Duration, tickBegin time.Duration,
+	tickStep time.Duration) {
 	var (
 		cumulIntvl time.Duration
 	)
 
-	log.Printf("Ringing after %v total", a.totalDuration)
-	time.AfterFunc(a.totalDuration, func() {
+	log.Printf("Ringing after %v total", totalDuration)
+	time.AfterFunc(totalDuration, func() {
 		a.Ring()
 	})
 
@@ -70,8 +60,8 @@ func (a *Alarm) Start() {
 	tick after every tickStep
 	*/
 	log.Printf("Ticking every %v when last %v reached (i.e. after %v)",
-		a.tickStep, a.tickBegin, a.totalDuration-a.tickBegin)
-	for cumulIntvl = (a.totalDuration - a.tickBegin); cumulIntvl < a.totalDuration; cumulIntvl += a.tickStep {
+		tickStep, tickBegin, totalDuration-tickBegin)
+	for cumulIntvl = (totalDuration - tickBegin); cumulIntvl < totalDuration; cumulIntvl += tickStep {
 		// wrapped into func so param <timeLeft> 
 		// is the correct one everytime
 		func(timeLeft time.Duration) {
@@ -79,7 +69,7 @@ func (a *Alarm) Start() {
 			time.AfterFunc(cumulIntvl, func() {
 				a.Tick(timeLeft)
 			})
-		}(a.totalDuration - cumulIntvl)
+		}(totalDuration - cumulIntvl)
 	}
 
 }

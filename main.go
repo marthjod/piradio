@@ -1,16 +1,17 @@
 package main
 
 import (
-	// "alarm"
+	"alarm"
 	// go get code.google.com/p/gcfg
 	"code.google.com/p/gcfg"
-	"fmt"
+	"log"
 	"os"
 	// "os/exec"
-	"player"
-	// "sayer"
 	"flag"
+	"player"
+	"sayer"
 	"syscall"
+	"time"
 )
 
 /*	the expected config file key-value structure;
@@ -57,8 +58,8 @@ type Config struct {
 func main() {
 
 	var (
-		// a           *alarm.Alarm
-		// s           *sayer.Sayer
+		a         *alarm.Alarm
+		s         *sayer.Sayer
 		p         *player.Player
 		err       error
 		input     string
@@ -68,6 +69,8 @@ func main() {
 		bytesRead int
 		inputKey  []byte
 		// keyEventListener *exec.Cmd
+		countdownConfigMode bool
+		countdownTime       time.Duration
 	)
 
 	flag.StringVar(&confFile, "config", "piradio.ini",
@@ -84,20 +87,19 @@ func main() {
 	}
 
 	p = player.NewPlayer(conf.Streams.StreamsList)
-	/*	Sayer and Alarm DISABLED FOR NOW
-		s = sayer.NewSayer(conf.Sounds.SoundsFile, p)
-		s will be used fo Alarm a (see below)
-	*/
+	s = sayer.NewSayer(conf.Sounds.SoundsFile, p)
+	a = alarm.NewAlarm(s, p)
+	countdownTime = 0
 
 	// create named pipe (fifo)
 	err = syscall.Mkfifo(conf.IPC.FifoPath, syscall.S_IFIFO|0666)
 	if err != nil {
-		fmt.Println(conf.IPC.FifoPath, err)
+		log.Println(conf.IPC.FifoPath, err)
 	}
 
 	fifo, err = os.Open(conf.IPC.FifoPath)
 	if err != nil {
-		fmt.Printf("Could not acquire control input from %s, aborting (%s).",
+		log.Printf("Could not acquire control input from %s, aborting (%s).",
 			conf.IPC.FifoPath, err)
 		os.Exit(1)
 	}
@@ -108,7 +110,7 @@ func main() {
 		keyEventListener = exec.Command("sudo", "./key-event", "/dev/input/event0")
 		err = keyEventListener.Start()
 		if err != nil {
-			fmt.Printf("Could not start key event listener, aborting.")
+			log.Printf("Could not start key event listener, aborting.")
 			os.Exit(1)
 		}
 	*/
@@ -123,7 +125,9 @@ func main() {
 			// (checking this earlier panicked [?])
 			if inputKey[0] != 0 {
 				input = string(inputKey)
-				fmt.Printf("Read from fifo: bytes %v = string (key) <%v>\n", inputKey, input)
+				/* log.Printf("Read from fifo: bytes %v = string (key) <%v>\n", 
+				inputKey, input)
+				*/
 
 				switch input {
 				case "78":
@@ -149,14 +153,48 @@ func main() {
 				case "73":
 					p.NextStreamByNumber(9)
 				case "14":
-					p.Quit()
-					fmt.Println("Quit")
-					os.Exit(0)
+					if countdownConfigMode {
+						countdownTime = 0
+						countdownConfigMode = false
+						log.Println("Left countdown config mode")
+					} else {
+						p.Quit()
+						log.Println("Quit")
+						os.Exit(0)
+					}
+				case "96":
+					if countdownConfigMode {
+
+						// TODO check if maximum 59m0s exceeded...
+						// TODO make tickBegin and tickStep flexible according
+						// to given values...
+						a.Start(countdownTime, 5*time.Minute, 1*time.Minute)
+
+						// reset
+						countdownTime = 0
+						countdownConfigMode = false
+						log.Println("Started countdown, left countdown config mode")
+					} else {
+						countdownConfigMode = true
+						log.Println("Entered countdown config mode")
+					}
+				case "82":
+					if countdownConfigMode {
+						countdownTime += 10 * time.Minute
+						log.Printf("Countdown time = %v", countdownTime)
+						s.Say(countdownTime.String())
+					}
+				case "83":
+					if countdownConfigMode {
+						countdownTime += 1 * time.Minute
+						log.Printf("Countdown time = %v", countdownTime)
+						s.Say(countdownTime.String())
+					}
 				}
 			}
 		} else if err.Error() != "EOF" {
 			// "EOF" is expected if no data waiting
-			fmt.Println(err)
+			log.Println(err)
 		}
 	}
 }

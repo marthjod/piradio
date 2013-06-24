@@ -82,7 +82,7 @@ int main (int argc, char *argv[]) {
 	   		snprintf(key, 4, "%d", (ev[1].code));
 	   		// printf("key is now %s\n", key);
 	   		
-	   	        // write string to named pipe (fifo)
+	   	    // write string to named pipe (fifo)
 			pipe = open(fifo, O_WRONLY);
 			write(pipe, key, 4);
 			close(pipe);
