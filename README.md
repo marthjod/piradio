@@ -22,16 +22,20 @@ As of now, _main.go_ recognizes the following commands from keyboard/numpad-only
 
 | Command (entered without newline) | Function |
 |:--------|:------------|
-| `1` through `9` | If available and not already playing, play stream no. `<number>` in _streams.list_ |
-| `<backspace>`    | Quit main executable |
+| `1` through `9` | If available and not already playing, play stream no. `<number>` from _streams.list_ |
+| `<backspace>`    | Quit main executable / abort countdown config |
 | `+`   | Increase volume |
 | `-` | Decrease volume |
+| `<Enter>` | Enter countdown config mode / confirm (start) countdown |
+| `0` | Increase countdown time by 10 minutes |
+| `000` | Increase countdown time by 1 minute |
 
-However, keyboard input depends on an underlying [Bash script](https://github.com/marthjod/piradio/blob/master/getkey.sh)
-which can always monitor a specific input device.
-Because we want to be able to run _piradio_ automatically, without a terminal attached, we need an external
-helper process returning information about a key pressed to _main.go_.
-
+Because we want to be able to run _piradio_ without a terminal attached (think autostarted daemon), we need an external
+helper process providing us with information about key press events ("key logger").
+[key-event.c](https://github.com/marthjod/piradio/blob/master/key-event.c) (called with the correct
+input device as argument, e.g. `./key-event /dev/input/event0`) catches key events and writes them to 
+a FIFO (named pipe), from which _main.go_ in turn retrieves them. The path to this FIFO must be configured in 
+the config file and match the one used by the keylogger binary.
 
 
 Config file
@@ -57,6 +61,9 @@ SoundsFile = sounds.json
 [Volume]
 VolUpStep = 20
 VolDownStep = 20
+
+[IPC]
+FifoPath = /tmp/gofifo
 
 ```
 
@@ -94,42 +101,15 @@ _Sayer_ objects must be initialized with a valid path to a _sounds.json_ and a p
 
 
 
-Alarms (disabled fttb)
+Alarms
 ------
 
 Alarms run for a total duration and start ticking after each interval (simulating a countdown) after a certain amount of time 
-has passed. For example, you can set an alarm which will ring after 2 minutes 30 seconds and will start ticking
-every 10 seconds when 1 minute is left (i.e. after 1 minute 30 seconds). If it finds a sound file mapped 
+has passed. For example, you can set an alarm which will ring after 12 minutes and will start ticking
+every minute when 5 minutes are left (i.e. after 7 minutes). If it finds a sound file mapped 
 to the current tick time,
-it will stop the current _Player_, play this sound file and resume the _Player_.
+it will stop the current _Player_, play this sound file (louder than the previous player) and resume the _Player_.
 
-### Set up alarm (timer)
-
-**NB: Currently not featured in _main.go_**
-
-Setting up an alarm (user input marked with `#`) and example alarm output:
-
-```
-alarm #
-Total: 2m30s #
-Start ticking at ... left: 1m #
-Tick every ...: 10s #
-Ringing after 2m30s total
-Ticking every 10s when last 1m0s reached (i.e. after 1m30s)
-*tick* (time left: 1m0s)
-/usr/bin/cvlc --volume=<current player volume> <sounds path>/1m0s.mp3
-Resuming player
-*tick* (time left: 50s)
-*tick* (time left: 40s)
-*tick* (time left: 30s)
-/usr/bin/cvlc --volume=<current player volume> <sounds path>/30s.mp3
-Resuming player
-*tick* (time left: 20s)
-*tick* (time left: 10s)
-Ringing alarm
-/usr/bin/cvlc --volume=<current player volume> <sounds path>/alarm.mp3
-Resuming player
-```
 
 
 Setup
@@ -159,23 +139,22 @@ go install player
 go install sayer
 go install alarm
 ```
-
 * Populate your _streams.list_, one URL per line
 * (Alarms) Acquire some sounds for alarm ticks with, e.g.,
 
 ```bash
 mplayer -really-quiet -noconsolecontrols \
-  -dumpaudio -dumpfile 1m30s.mp3 \
-  "http://translate.google.com/translate_tts?tl=en&q=1+minute+30+seconds+left"
+  -dumpaudio -dumpfile 1m0s.mp3 \
+  "http://translate.google.com/translate_tts?tl=en&q=1+minute+left"
 ```
-
 * (Alarms) Add sound file names and paths to your _sounds.json_, accordingly
 * Run _main.go_
 	* `go run main.go` or
-	* `go run main.go --config=/path/to/piradio.ini`
-
-* Find out the device name for the attached input device and map key codes, if needed (see [Bash script](https://github.com/marthjod/piradio/blob/master/getkey.sh))
+	* **DOES NOT WORK YET** `go run main.go --config=/path/to/piradio.ini`
 * For autostart, put a [SysV Init script](https://github.com/marthjod/piradio/blob/master/piradio-sysv-init) in _/etc/init.d/_ and update runlevel configuration (`sudo update-rc.d piradio defaults`)
+* Compile the "keylogger" (`gcc -o key-event key-event.c`) and add the appropriate call to the init script
+> NB: the "keylogger" is only intended for a headless Raspberry Pi with no other uses, so this does not invade the user's privacy; also, the 
+FIFO gets emptied whenever read, so not even the user's stream choices etc. "touch ground"...
 
 
 Example hardware setup
@@ -186,3 +165,4 @@ Example hardware setup
 - USB numpad
 - USB WiFi dongle
 - SD card
+- speakers
