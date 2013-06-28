@@ -4,6 +4,8 @@ piradio
 [Go](http://golang.org) wrapping for network stream playing (think Internet radio) plus
 timer functions targeted at running on a [Raspberry Pi](http://www.raspberrypi.org/)
 
+![](https://github.com/marthjod/piradio/blob/master/piradio.gif?raw=true)
+
 
 Description
 ===========
