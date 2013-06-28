@@ -110,7 +110,7 @@ Example _sounds.json_:
 }
 ```
 
-NB: All parts concerned with time durations (_Alarm_, _Sayers_ called by _Alarm_ functions)
+NB: All parts concerned with time durations (_Alarms_ and _Sayers_ called by _Alarm_ functions)
 only recognize full-minute times up to _59m0s_ (format is that of Go's
 [time.Duration string representation](http://golang.org/pkg/time/#Duration.String)) as of now.
 
