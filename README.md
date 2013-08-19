@@ -30,7 +30,7 @@ As of now, _main.go_ recognizes the following commands from keyboard/numpad-only
 | `-` | Decrease volume |
 | `<Enter>` | Enter countdown config mode / confirm (start) countdown^1 |
 | `0` | Increase countdown time by 10 minutes |
-| `000` | Increase countdown time by 1 minute |
+| `,` | Increase countdown time by 1 minute (`0`and `000` are the same on some numpads, unfortunately) |
 
 ^1 when in countdown config mode
 
@@ -138,7 +138,11 @@ every minute when 5 minutes are left (i.e. after 7 minutes). If it finds a sound
 to the current tick time,
 it will stop the current _Player_, play this sound file (louder than the previous player) and resume the _Player_.
 
+TODOs/Known bugs
+------
 
+- Because of the heavy key polling (?), _main.go_ is a strain on the CPU so far. This may be alleviated by lazier checking for key presses.
+- Setting a countdown for intervals < 5 min causes freezing (negative intervals etc.). Resort to intervals > 10 min for now.
 
 Setup
 =====
@@ -190,7 +194,8 @@ mplayer -really-quiet -noconsolecontrols \
 * Compile the "keylogger" (`gcc -o key-event key-event.c`) and add the appropriate call to the init script
 
 > NB: the "keylogger" is only intended for a headless Raspberry Pi with no other uses, so this does not invade the user's privacy; also, the
-FIFO gets emptied whenever read, so not even the user's stream choices etc. really "touch ground"...
+FIFO gets emptied whenever read, so not even the user's stream choices etc. really "touch ground" (unless you log to a log file).
+
 
 
 Example hardware setup

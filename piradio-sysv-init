@@ -16,6 +16,7 @@ APPUSER=pi
 GOROOT=/home/pi/go
 GOPATH=/var/piradio
 GORUN="$GOROOT/bin/go run"
+KEYEVENT="./key-event /dev/input/event0"
 
 # TODO there seems to be a bug preventing Go from finding
 # files not in the same dir (something with 'stat'...)
@@ -29,9 +30,11 @@ case "$1" in
 
 		# TODO cd'ing to $APPDIR is a temporary workaround (s.a.)
 		cd $APPDIR
+		echo "Starting key event listener daemon $KEYEVENT as user $(whoami)"
+		$KEYEVENT &
 		echo "Starting $APP as user $APPUSER, GOPATH $GOPATH"
-		echo "$GORUN $APP"
-		su $APPUSER -c "GOPATH=$GOPATH; export GOPATH; $GORUN $APP &"
+		echo "$GORUN $APP &> $APPDIR/piradio.log"
+		su $APPUSER -c "GOPATH=$GOPATH; export GOPATH; $GORUN $APP &> $APPDIR/piradio.log &"
 		exit 0
 	;;
 	

@@ -2,3 +2,5 @@ sounds/
 main
 key-event
 pkg/
+src/
+streams.list
