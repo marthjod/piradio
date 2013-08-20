@@ -118,6 +118,7 @@ func main() {
 	inputKey = make([]byte, 2)
 
 	for {
+		time.Sleep(100 * time.Millisecond)
 		bytesRead, err = fifo.Read(inputKey)
 
 		if err == nil && bytesRead == 2 {
