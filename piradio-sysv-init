@@ -11,11 +11,10 @@
 ### END INIT INFO
 
 APPDIR=/var/piradio
-APP=$APPDIR/main.go
+APP_BIN=$APPDIR/main
 APPUSER=pi
 GOROOT=/home/pi/go
 GOPATH=/var/piradio
-GORUN="$GOROOT/bin/go run"
 KEYEVENT="./key-event /dev/input/event0"
 
 # TODO there seems to be a bug preventing Go from finding
@@ -28,18 +27,17 @@ case "$1" in
 
 	start)
 
-		# TODO cd'ing to $APPDIR is a temporary workaround (s.a.)
 		cd $APPDIR
 		echo "Starting key event listener daemon $KEYEVENT as user $(whoami)"
 		$KEYEVENT &
-		echo "Starting $APP as user $APPUSER, GOPATH $GOPATH"
-		echo "$GORUN $APP &> $APPDIR/piradio.log"
-		su $APPUSER -c "GOPATH=$GOPATH; export GOPATH; $GORUN $APP &> $APPDIR/piradio.log &"
+		echo "Starting $APP_BIN as user $APPUSER, GOPATH $GOPATH"
+		echo "$APP_BIN &>> $APPDIR/piradio.log"
+		su $APPUSER -c "GOPATH=$GOPATH; export GOPATH; $APP_BIN &>> $APPDIR/piradio.log &"
 		exit 0
 	;;
 	
 	stop)
-		echo "Stopping $APP..."
+		echo "Stopping $APP_BIN..."
 		# TODO
 	;;
 	

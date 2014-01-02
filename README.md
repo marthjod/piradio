@@ -141,7 +141,6 @@ it will stop the current _Player_, play this sound file (louder than the previou
 TODOs/Known bugs
 ------
 
-- Because of the heavy key polling (?), _main.go_ is a strain on the CPU so far. This may be alleviated by lazier checking for key presses.
 - Setting a countdown for intervals < 5 min causes freezing (negative intervals etc.). Resort to intervals > 10 min for now.
 
 Setup
